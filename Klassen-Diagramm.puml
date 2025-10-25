@@ -1,0 +1,125 @@
+@startuml
+title Mini-Shop-App
+
+package "Domain / Model" {
+    class BaseEntity {
+        +Long id
+        +UUID publicId
+        +int hashCode()
+        +boolean equals(Object o)
+    }
+
+
+    class Shop {
+        +String shopName
+        --
+        +List<Product> products
+    }
+
+    class Product {
+        +String name
+        +Double price
+    }
+
+    BaseEntity <|-- Shop
+    BaseEntity <|-- Product
+
+    Shop "1" --> "0..*" Product : owns >
+}
+
+package "Persistence" {
+    interface ShopRepository
+    interface ProductRepository
+
+    ShopRepository --> Shop
+    ProductRepository --> Product
+}
+
+package "Service Layer" {
+    class ShopService {
+        +void addProductToShop(Long shopId, ProductRequest request)
+        +Shop createShop(ShopRequest request)
+        +void deleteShop(Long shopId)
+        +List<Product> getAllProductsFromShop(Long shopId)
+        +Shop getShopById(Long)
+        +void removeProductFromShop(Long shopId, Long productId)
+        +Product updateProductInShop(Long shopId, Long productId, ProductRequest request)
+    }
+
+    class ProductService {
+        +Product createProduct(ProductRequest request, Long shopId)
+        +void deleteProduct(Long id)
+        +Product updateProduct(Long id, ProductRequest request)
+    }
+
+    ShopService --> ShopRepository
+    ShopService --> ProductRepository : manages products through shop
+    ProductService --> ProductRepository
+    ProductService --> ShopRepository : for validations / existence checks
+
+}
+
+package "exception" {
+    class ServiceException {
+        +ServiceException(String message)
+        +static ofNotFound(Long id)
+    }
+
+    class GlobalExceptionHandler {
+        +onServiceException(ServiceException)
+        +onValidation(IllegalArgumentException)
+        +onDtoValidation(MethodArgumentNotValidException)
+        +onEntityValidation(jakarta.validation.ConstraintViolationException)
+        +onUnexpectedException(Exception)
+    }
+
+    ProductService --> ServiceException : throws if shop/product not found
+    ShopService --> ServiceException : throws if shop/product not found
+    GlobalExceptionHandler --> ServiceException
+}
+
+package "Controller" {
+    class ShopController {
+        +Shop getShop(Long id)
+        +void deleteShop(Long id)
+        +Shop createShop(ShopRequest request)
+        +Product addProductToShop(Long shopId, ProductRequest request)
+        +void removeProductFromShop(Long shopId, Long productId)
+        +List<Product> getAllProductsFromShop(Long shopId)
+        +Product updateProductInShop(Long shopId, Long productId, ProductRequest request)
+        +void deleteProduct(Long productId)
+        +Product createProduct(ProductRequest request, Long shopId)
+    }
+
+    ShopController --> ShopService
+    ShopController --> ProductService
+}
+
+
+
+package "Request / Guard" {
+    class ShopRequest {
+        +String name
+    }
+
+    class ProductRequest {
+        +String name
+        +Double price
+    }
+
+    class Guard {
+        +void validateProduct(ProductRequest, Long)
+        +void validateShop(ShopRequest)
+    }
+
+    ShopRequest <-- ShopController
+    Guard <-- ShopController
+    ProductRequest <-- ShopController
+}
+
+ShopController -[hidden]-> Guard : <<hidden>>
+ServiceException -[hidden]-> ShopController : <<hidden>>
+ServiceException -[hidden]-> ShopService : <<hidden>>
+
+
+@enduml
