@@ -9,10 +9,10 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString(callSuper = true, exclude = "products")
+@Getter
 @Entity
 @Table(name = "shop")
-@ToString(callSuper = true)
-@Getter
 public class Shop extends BaseEntity {
 
     @Column(name = "shopName", unique = true, nullable = false, length = 50)
@@ -28,5 +28,21 @@ public class Shop extends BaseEntity {
     public Shop(String shopName) {
         super();
         this.shopName = shopName;
+    }
+
+    public void addProduct(Product product) {
+        if (!products.contains(product)) {
+            products.add(product);
+            if (product.getShop() != this) {
+                product.setShop(this);
+            }
+        }
+    }
+
+    public void removeProduct(Product product) {
+        products.remove(product);
+        if (product.getShop() == this) {
+            product.setShop(null);
+        }
     }
 }

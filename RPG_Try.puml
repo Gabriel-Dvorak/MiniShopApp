@@ -1,0 +1,121 @@
+@startuml
+title In-Game Economy Domain Model (Final Version v2)
+
+' ===== DOMAIN / MODEL =====
+
+class BaseEntity {
+    +Long id
+}
+
+class Character {
+    +String name
+    +int age
+    --
+    +Inventory inventory
+    +List<ItemSlot> equipmentSlots
+}
+
+class ItemSlot {
+    +String slotName
+    +SlotType slotType
+    --
+    +Item equippedItem
+}
+
+enum SlotType {
+    HEAD
+    TORSO
+    LEGS
+    FEET
+    HANDS
+    WEAPON1
+    WEAPON2
+    WEAPON3
+    CAPE
+    RING
+    ACCESSORY
+    BACKPACK
+}
+
+class Inventory {
+    +int maxCapacity
+    +double goldAmount
+    +List<Item> items
+}
+
+class Item {
+    +String name
+    +ItemType type
+    +double value
+    +boolean equippable
+}
+
+enum ItemType {
+    GENERIC
+    WEAPON
+    ARMOR
+    CLOTHING
+    CONSUMABLE
+    HOLDING
+}
+
+class HoldingItem {
+    +int capacity
+    +List<Item> containedItems
+}
+
+class Cloth {
+    +int defense
+}
+
+class Shop {
+    +String name
+    +double goldAmount
+    +List<Item> stock
+}
+
+class Transaction {
+    +List<Item> itemsOffered
+    +List<Item> itemsReceived
+    +double goldFromCharacter
+    +double goldFromShop
+    +double totalWorthCharacter
+    +double totalWorthShop
+}
+
+' ===== RELATIONS =====
+
+BaseEntity <|-- Character
+BaseEntity <|-- Item
+BaseEntity <|-- Inventory
+BaseEntity <|-- Shop
+BaseEntity <|-- Transaction
+BaseEntity <|-- ItemSlot
+Item <|-- HoldingItem
+Item <|-- Cloth
+
+' --- Character Relations ---
+Character "1" --> "1" Inventory : owns >
+Character "1" --> "0..*" ItemSlot : equips via >
+
+' --- ItemSlot Relations ---
+ItemSlot "1" --> "0..1" Item : equipped item >
+ItemSlot --> Character : belongs to >
+
+' --- Inventory Relations ---
+Inventory "1" --> "0..*" Item : contains >
+
+' --- HoldingItem Relations ---
+HoldingItem "1" --> "0..*" Item : stores >
+
+' --- Shop Relations ---
+Shop "1" --> "0..*" Item : sells >
+
+' --- Transaction Relations ---
+Transaction "1" --> "1" Shop : involves >
+Transaction "1" --> "1" Character : initiated by >
+Transaction "1" --> "0..*" Item : trades >
+Transaction --> Inventory : adjusts gold >
+Transaction --> Shop : adjusts shop gold >
+
+@enduml

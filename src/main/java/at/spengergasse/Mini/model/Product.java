@@ -8,10 +8,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.ToString;
 
+@ToString(callSuper = true, exclude = "shop")
+@Getter
 @Entity
 @Table(name = "product")
-@ToString(callSuper = true)
-@Getter
 public class Product extends BaseEntity {
 
     @Column(name = "name", unique = true, nullable = false, length = 50)
@@ -29,11 +29,18 @@ public class Product extends BaseEntity {
 
     public Product() {}
 
+    public Product(String name, Double price) {
+        this.name = name;
+        this.price = price;
+    }
+
     public Product(String name, Double price, Shop shop) {
         super();
         this.name = name;
         this.price = price;
-        this.shop = shop;
+        if (shop != null) {
+            shop.addProduct(this); // synchronisiert beide Seiten
+        }
     }
 
     public Product withUpdatedValues(String newName, Double newPrice) {
@@ -42,5 +49,15 @@ public class Product extends BaseEntity {
 
     public Product withUpdatedValues(String newName, Double newPrice, Shop newShop) {
         return new Product(newName, newPrice, newShop);
+    }
+
+    public void setShop(Shop shop) {
+        if (this.shop != null && this.shop != shop) {
+            this.shop.getProducts().remove(this);
+        }
+        this.shop = shop;
+        if (shop != null && !shop.getProducts().contains(this)) {
+            shop.getProducts().add(this);
+        }
     }
 }

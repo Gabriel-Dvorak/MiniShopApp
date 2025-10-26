@@ -37,4 +37,17 @@ public abstract class BaseEntity {
 
         return Objects.equals(businessId, that.businessId);
     }
+
+    // -------------------------
+    // TEST-HILFSMETHODE
+    // -------------------------
+    public void setId(Long id) {  // package-private, nur für Tests
+        try {
+            java.lang.reflect.Field field = BaseEntity.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(this, id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

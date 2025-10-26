@@ -19,6 +19,7 @@ package "Domain / Model" {
     class Product {
         +String name
         +Double price
+        +Shop shop
     }
 
     BaseEntity <|-- Shop
