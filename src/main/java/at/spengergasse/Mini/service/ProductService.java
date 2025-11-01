@@ -94,7 +94,7 @@ public class ProductService {
                     .orElseThrow(() -> ServiceException.ofNotFound(shopId));
         }
 
-        Product product = new Product(request.getName(), request.getPrice(), shop);
+        Product product = new Product(request.name(), request.price(), shop);
 
         // Wenn Shop existiert, Bidirektionalität pflegen
         if (shop != null) {
@@ -114,8 +114,8 @@ public class ProductService {
         guard.validateProduct(request, productId);
 
         Product updated = existing.withUpdatedValues(
-                request.getName(),
-                request.getPrice()
+                request.name(),
+                request.price()
         );
 
         LOGGER.info("Updated product '{}' (id={})", existing.getName(), productId);

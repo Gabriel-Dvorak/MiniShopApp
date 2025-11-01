@@ -79,11 +79,11 @@ public class ShopService {
     public Shop createShop(ShopRequest request) {
         guard.validateShop(request);
 
-        shopRepository.findByShopName(request.getShopName()).ifPresent(existing -> {
-            throw new ServiceException("Shopname '" + request.getShopName() + "' existiert bereits!");
+        shopRepository.findByShopName(request.shopName()).ifPresent(existing -> {
+            throw new ServiceException("Shopname '" + request.shopName() + "' existiert bereits!");
         });
 
-        Shop shop = new Shop(request.getShopName());
+        Shop shop = new Shop(request.shopName());
 
         shopRepository.save(shop);
 
@@ -103,7 +103,7 @@ public class ShopService {
 
         guard.validateProduct(request, null); // null, da es ein neues Produkt ist
 
-        Product product = new Product(request.getName(), request.getPrice(), shop);
+        Product product = new Product(request.name(), request.price(), shop);
 
         shop.getProducts().add(product);
 

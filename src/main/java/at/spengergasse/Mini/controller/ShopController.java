@@ -144,6 +144,7 @@ import at.spengergasse.Mini.service.ProductService;
 import at.spengergasse.Mini.service.ShopService;
 import at.spengergasse.Mini.viewmodel.ProductRequest;
 import at.spengergasse.Mini.viewmodel.ShopRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -165,7 +166,7 @@ public class ShopController {
 
     // Erstelle einen neuen Shop
     @PostMapping
-    public Shop createShop(@RequestBody ShopRequest request) {
+    public Shop createShop(@RequestBody @Valid ShopRequest request) {
         return shopService.createShop(request);
     }
 
@@ -177,7 +178,7 @@ public class ShopController {
 
     // Produkt zu Shop hinzufügen (ruft ShopService.addProductToShop auf)
     @PostMapping("/{shopId}/products")
-    public Product addProductToShop(@PathVariable Long shopId, @RequestBody ProductRequest request) {
+    public Product addProductToShop(@PathVariable Long shopId, @RequestBody @Valid ProductRequest request) {
         return shopService.addProductToShop(shopId, request);
     }
 
@@ -197,7 +198,7 @@ public class ShopController {
     @PutMapping("/{shopId}/products/{productId}")
     public Product updateProductInShop(@PathVariable Long shopId,
                                        @PathVariable Long productId,
-                                       @RequestBody ProductRequest request) {
+                                       @RequestBody @Valid ProductRequest request) {
         return shopService.updateProductInShop(shopId, productId, request);
     }
 
@@ -210,8 +211,7 @@ public class ShopController {
     // Produkt direkt erstellen, optional Shop-ID (ProductService.createProduct)
     @PostMapping("/products")
     public Product createProduct(@RequestParam(required = false) Long shopId,
-                                 @RequestBody ProductRequest request) {
+                                 @RequestBody @Valid ProductRequest request) {
         return productService.createProduct(request, shopId);
     }
 }
-

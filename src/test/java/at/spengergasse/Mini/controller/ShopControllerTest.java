@@ -30,7 +30,8 @@ class ShopControllerTest {
 
     @Test
     void createAndGetShop() throws Exception {
-        ShopRequest request = new ShopRequest("TestShop");
+        ShopRequest request;
+        request = new ShopRequest("TestShop");
 
         // Shop erstellen
         String json = objectMapper.writeValueAsString(request);
